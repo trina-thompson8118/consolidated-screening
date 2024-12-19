@@ -14,7 +14,7 @@ export async function GET(request) {
 
   // Set headers for the API request, including the subscription key for authentication
   const headers = {
-    "subscription-key": process.env.NEXT_PUBLIC_SUBSCRIPTION_KEY, // Use environment variable for security.
+    "subscription-key": process.env.SUBSCRIPTION_KEY, // Use environment variable for security.
   };
 
   try {
