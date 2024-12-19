@@ -3,6 +3,8 @@ Consolidated Screening List Search Engine
 
 A **React-based web application** for searching the **Consolidated Screening List (CSL)**, a list of parties for which the US Government maintains export restrictions. This application enables users to search for restricted parties involved in export transactions, view detailed results, and navigate large datasets efficiently.
 
+For a demo of this please visit [DEMO](https://consolidated-screening.vercel.app/).
+
 Features
 --------
 
