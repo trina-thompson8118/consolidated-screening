@@ -1,101 +1,149 @@
-import Image from "next/image";
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { fetchApiResults } from "@/app/utils/screeningListApi";
+import Table from "@/app/components/Table";
+import Pagination from "@/app/components/Pagination";
+import SkeletonLoader from "@/app/components/SkeletonLoader"; // Import SkeletonLoader
+import ErrorMessage from "@/app/components/ErrorMessage";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [data, setData] = useState([]); // Stores search results
+  const [totalResults, setTotalResults] = useState(0); // Tracks total number of results for pagination
+  const [error, setError] = useState(null); // Holds error messages, if any
+  const [query, setQuery] = useState(""); // Tracks the search query entered by the user
+  const [loading, setLoading] = useState(false); // Tracks loading during pagination
+  const [currentPage, setCurrentPage] = useState(1); // Keeps track of the current page for pagination
+  const [expanded, setExpanded] = useState(null); // Tracks which table row is expanded for additional details
+  const [isSearching, setIsSearching] = useState(false); // Tracks whether a search has been performed
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  /**
+  * Handles the search functionality.
+  * Fetches results from the API for the given query and resets the pagination.
+  */
+  const handleSearch = async (event) => {
+    event.preventDefault();
+
+    // Validate the query input
+    if (!query.trim()) {
+      setError("Please enter a search term.");
+      return;
+    }
+
+    // Reset states and initialize loading
+    setLoading(true);
+    setError(null);
+    setData([]);
+    setCurrentPage(1);
+    setIsSearching(true);
+
+    try {
+      const result = await fetchApiResults(query, 1);
+      setData(result.results || []);
+      setTotalResults(result.total || 0);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+  * Handles pagination when navigating between pages.
+  * Updates the results based on the selected page.
+  */
+  const handlePageChange = async (pageNumber) => {
+    // Prevent redundant API calls for the current page
+    if (pageNumber === currentPage) return;
+    setLoading(true);
+    setCurrentPage(pageNumber);
+
+    try {
+      const result = await fetchApiResults(query, pageNumber);
+      setData(result.results || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Toggles the expanded state for table rows.
+   * Allows showing or hiding additional row details.
+   */
+  const toggleDetails = (id) => {
+    const newExpandedState = expanded === id ? null : id;
+    setExpanded(newExpandedState);
+  };
+
+  return (
+    <div className="flex justify-center py-6 font-sans">
+      <div className="w-full max-w-4xl space-y-6">
+        <h1 className="text-3xl font-bold text-center">
+          Consolidated Screening List Search Engine
+        </h1>
+
+        {/* Introductory text (only displayed before searching) */}
+        {!isSearching && (
+          <p className="text-gray-600 text-center">
+            The Consolidated Screening List (CSL) is a list of parties for which
+            the US Government maintains export restrictions. Use this tool to
+            search for restricted parties involved in export transactions.
+          </p>
+        )}
+
+        {/* Search form */}
+        <form
+          onSubmit={handleSearch}
+          className="flex space-x-4 items-center"
+        >
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Enter a name to search"
+            className="border px-4 py-2 flex-grow rounded-md"
+          />
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded-md"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            Search
+          </button>
+        </form>
+
+        {/* Display error messages if any */}
+        {error && <ErrorMessage error={error} />}
+
+        {/* Show either the Skeleton Loader or the Table */}
+        <div className="relative">
+          {loading ? (
+            <SkeletonLoader /> // Show skeleton loader while loading
+          ) : (
+            data.length > 0 && (
+              <Table data={data} expanded={expanded} toggleDetails={toggleDetails} />
+            )
+          )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        {/* Display message if no results are found */}
+        {!loading && isSearching && data.length === 0 && (
+          <div className="text-center text-gray-600 mt-4">
+            <p className="text-lg font-semibold">No results found.</p>
+            <p>Try refining your search query and try again.</p>
+          </div>
+        )}
+
+        {/* Pagination component */}
+        {totalResults > 10 && (
+          <Pagination
+            totalPages={Math.ceil(totalResults / 10)}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        )}
+      </div>
     </div>
   );
 }

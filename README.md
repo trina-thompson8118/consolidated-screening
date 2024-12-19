@@ -1,36 +1,118 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+Consolidated Screening List Search Engine
+=========================================
 
-## Getting Started
+A **React-based web application** for searching the **Consolidated Screening List (CSL)**, a list of parties for which the US Government maintains export restrictions. This application enables users to search for restricted parties involved in export transactions, view detailed results, and navigate large datasets efficiently.
 
-First, run the development server:
+Features
+--------
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+-   **Search Functionality**: Enter a name or keyword to query the CSL.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+-   **Detailed Results**: Expandable rows to view additional details.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+-   **Pagination**: Smooth navigation through paginated data.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+-   **Error Handling**: User-friendly error messages for invalid inputs or API issues.
 
-## Learn More
+-   **Loading Feedback**: Skeleton loader ensures a seamless user experience during data retrieval.
 
-To learn more about Next.js, take a look at the following resources:
+Technologies Used
+-----------------
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+-   **React**: Frontend framework for building the user interface.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+-   **Tailwind CSS**: Utility-first CSS framework for styling.
 
-## Deploy on Vercel
+-   **Custom Components**:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    -   `Table`: Displays search results.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+    -   `Pagination`: Manages pagination controls.
+
+    -   `SkeletonLoader`: Provides a loading animation.
+
+    -   `ErrorMessage`: Displays error messages.
+
+-   **API Utility**: Custom function `fetchApiResults` for interacting with external data sources.
+
+Installation
+------------
+
+1.  **Clone the repository:**
+
+    ```
+    git clone <repository-url>
+    cd <repository-directory>
+    ```
+
+2.  **Install dependencies:**
+
+    ```
+    npm install
+    ```
+
+3.  **Start the development server:**
+
+    ```
+    npm run dev
+    ```
+
+4.  **Open the app:** Navigate to `http://localhost:3000` in your browser.
+
+Usage
+-----
+
+1.  **Search:**
+
+    -   Enter a search term in the input field and click "Search".
+
+    -   Results are displayed in a table with expandable rows for additional details.
+
+2.  **Pagination:**
+
+    -   Use pagination controls to navigate between pages if there are more than 10 results.
+
+3.  **Error Handling:**
+
+    -   If an error occurs (e.g., no search term or API failure), a user-friendly message is displayed.
+
+4.  **Loading Feedback:**
+
+    -   A skeleton loader is displayed while data is being fetched.
+
+Deployment
+----------
+
+1.  **Build the project:**
+
+    ```
+    npm run build
+    ```
+
+2.  **Start the production server:**
+
+    ```
+    npm start
+    ```
+
+3.  **Deploy:** Deploy the project to your preferred hosting service (e.g., Vercel, Netlify).
+
+Future Enhancements
+-------------------
+
+-   Add advanced search filters for more precise queries.
+
+-   Include export options for search results (e.g., CSV, PDF).
+
+-   Add dark mode for enhanced usability.
+
+License
+-------
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+Acknowledgments
+---------------
+
+-   **trade.gov**: For providing the Consolidated Screening List.
+-   **Open-Source Tools**: Libraries and frameworks used in this project.
